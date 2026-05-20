@@ -1,41 +1,50 @@
-import admin from '../firebaseAdmin.js'
+import jwt from 'jsonwebtoken'
+import User from '../models/User.js'
 
-const authMiddleware = async (
-  req,
-  res,
-  next
-) =>  {
-  console.log(
-    req.headers.authorization
-  )
-  try {
-    const authHeader =
-      req.headers.authorization
+const authMiddleware =
+  async (req, res, next) => {
+    try {
+      const token =
+        req.headers.authorization?.split(
+          ' '
+        )[1]
 
-    if (!authHeader) {
-      return res.status(401).json({
-        message: 'No token'
+      if (!token) {
+        return res
+          .status(401)
+          .json({
+            message:
+              'No token provided'
+          })
+      }
+
+      const decoded = jwt.verify(
+        token,
+        process.env.JWT_SECRET
+      )
+
+      const user =
+        await User.findById(
+          decoded.id
+        )
+
+      if (!user) {
+        return res
+          .status(401)
+          .json({
+            message:
+              'User not found'
+          })
+      }
+
+      req.user = user
+
+      next()
+    } catch (error) {
+      res.status(401).json({
+        message: 'Unauthorized'
       })
     }
-
-    const token =
-      authHeader.split('Bearer ')[1]
-
-    const decoded =
-      await admin
-        .auth()
-        .verifyIdToken(token)
-
-    req.user = decoded
-
-    next()
-  } catch (error) {
-    console.log(error)
-
-    return res.status(401).json({
-      message: 'Unauthorized'
-    })
   }
-}
 
 export default authMiddleware

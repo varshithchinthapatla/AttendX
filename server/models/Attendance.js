@@ -1,31 +1,31 @@
 import mongoose from 'mongoose'
 
-const attendanceSchema = new mongoose.Schema(
-  {
-    date: {
-      type: String,
-    },
+const attendanceSchema =
+  new mongoose.Schema(
+    {
+      date: String,
 
-    subjectName: String,
+      subjectName: String,
 
-    status: {
-      type: String,
-      enum: [
-        'Present',
-        'Absent',
-        'Partial',
-      ],
-    },
+      status: {
+        type: String,
+        enum: [
+          'Present',
+          'Absent',
+          'Partial'
+        ]
+      },
 
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      userId: {
+        type:
+          mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+      }
     },
-  },
-  {
-    timestamps: true,
-  }
-)
+    {
+      timestamps: true
+    }
+  )
 
 export default mongoose.model(
   'Attendance',

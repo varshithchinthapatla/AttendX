@@ -8,26 +8,11 @@ export const markAttendance =
         status
       } = req.body
 
-      const existing =
-        await Attendance.findOne({
-          subjectName,
-          date: new Date()
-            .toISOString()
-            .split('T')[0]
-        })
-
-      if (existing) {
-        existing.status = status
-
-        await existing.save()
-
-        return res.json(existing)
-      }
-
       const attendance =
         await Attendance.create({
           subjectName,
           status,
+          userId: req.user._id,
           date: new Date()
             .toISOString()
             .split('T')[0]
@@ -44,36 +29,13 @@ export const markAttendance =
     }
   }
 
-export const updateAttendance =
-  async (req, res) => {
-    try {
-      const { id } = req.params
-
-      const { status } = req.body
-
-      const attendance =
-        await Attendance.findByIdAndUpdate(
-          id,
-          { status },
-          { new: true }
-        )
-
-      res.json(attendance)
-    } catch (error) {
-      console.log(error)
-
-      res.status(500).json({
-        message:
-          'Update failed'
-      })
-    }
-  }
-
 export const getAttendance =
   async (req, res) => {
     try {
       const attendance =
-        await Attendance.find().sort({
+        await Attendance.find({
+          userId: req.user._id
+        }).sort({
           createdAt: -1
         })
 
@@ -98,6 +60,7 @@ export const getTodayAttendance =
 
       const attendance =
         await Attendance.find({
+          userId: req.user._id,
           date: today
         })
 
@@ -108,6 +71,29 @@ export const getTodayAttendance =
       res.status(500).json({
         message:
           'Failed to fetch today attendance'
+      })
+    }
+  }
+
+export const updateAttendance =
+  async (req, res) => {
+    try {
+      const { status } = req.body
+
+      const attendance =
+        await Attendance.findByIdAndUpdate(
+          req.params.id,
+          { status },
+          { new: true }
+        )
+
+      res.json(attendance)
+    } catch (error) {
+      console.log(error)
+
+      res.status(500).json({
+        message:
+          'Update failed'
       })
     }
   }
