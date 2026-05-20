@@ -25,15 +25,13 @@ function Login() {
 
         const user = result.user
 
-        const firebaseToken =
-          await user.getIdToken()
-
         const { data } =
           await API.post(
             '/auth/google',
             {
-              token:
-                firebaseToken
+              email: user.email,
+              name:
+                user.displayName
             }
           )
 
