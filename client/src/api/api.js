@@ -2,7 +2,7 @@ import axios from 'axios'
 
 const API = axios.create({
   baseURL:
-  'https://attendx-server.onrender.com/api'
+ 'https://attendx-server-bon2.onrender.com'
 })
 
-export default API
+export default APIgit 
